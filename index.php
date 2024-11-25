@@ -1,16 +1,34 @@
 <?php
     error_reporting(E_ALL);
     ini_set('display_errors', 1);
-    
-    define('COMBINATIONS', 150);
-    define('MIN', 1);
-    define('MAX', 31);
-    define('MAX_DIGITS', 5);
-    //define('TOP_NUMBER', explode(',', '2,24,6,42,21,43,38,19,32,26,10,37,27,15,5'));
-    define('TOP_NUMBER', explode(',', '11,19,14,2,21,23,30,16,22,31,27,3,5,18,4'));
 
-    define('MIN_TOTAL', 69);
-    define('MAX_TOTAL', 104);
+    $lotto_mode = 6;
+    define('COMBINATIONS', 50);
+    define('MAX_DIGITS', $lotto_mode);
+
+    switch( $lotto_mode ) {
+        case 5 :
+            define('MIN', 1);
+            define('MAX', 31);
+            define('MIN_TOTAL', 69);
+            define('MAX_TOTAL', 104);
+            define('TOP_NUMBER', explode(',', '11,19,14,2,21,23,30,16,22,31,27,3,5,18,4')); // lotto 5
+        break;
+        case 6 :
+            define('MIN', 1);
+            define('MAX', 43);
+            define('MIN_TOTAL', 113);
+            define('MAX_TOTAL', 148);
+            define('TOP_NUMBER', explode(',', '2,24,6,42,21,43,38,19,32,26,10,37,27,15,5')); // lotto 6
+        break;
+        case 7 :
+            define('MIN', 1);
+            define('MAX', 37);
+            define('MIN_TOTAL', 113);
+            define('MAX_TOTAL', 140);
+            define('TOP_NUMBER', explode(',', '15,13,9,30,4,32,34,26,17,35,36,29,31,11,21')); // lotto 7
+        break;
+    }
 
     $current_combo;
     $x = 1;
@@ -22,7 +40,7 @@
         $max_digits = MAX_DIGITS;
         $current_combo = array();
 
-        $is_top = (mt_rand(1, 100) <= 70) ? 1 : 0;
+        $is_top = (mt_rand(1, 100) <= 70) ? 0 : 1;
         if($is_top) {
             // get from top numbers
             $rand = rand(1, 3);
