@@ -2,47 +2,49 @@
     error_reporting(E_ALL);
     ini_set('display_errors', 1);
 
-    $lotto_mode = 6;
-    define('COMBINATIONS', 50);
+    $lotto_mode = 7;
+    define('COMBINATIONS', 30);
     define('MAX_DIGITS', $lotto_mode);
     $generated_combos = [];
 
+    define('ODD_NUM', 2);
+
     switch( $lotto_mode ) {
         case 5 :
-            define('WINNING_NUMBERS', [10, 12, 13, 21, 31]); // winning numbers
-            define('BONUS_NUMBER', 23);
+            define('WINNING_NUMBERS', [7, 11, 18, 25, 26]); // winning numbers
+            define('BONUS_NUMBER', 6);
 
             define('TICKET_PRICE', 200);
             define('MIN', 1);
             define('MAX', 31);
-            define('MIN_TOTAL', 69);
+            define('MIN_TOTAL', 81);
             define('MAX_TOTAL', 92);
             define('TOP_NUMBER', explode(',', '11,19,14,2,21,23,30,16,22,31,27,3,5,18,4')); // lotto 5
-            define('PRIZE_POOL', [0=> 130300, 3 => 1000, 4 => 10600, 5 => 11538300]);
+            define('PRIZE_POOL', [0=> 130500, 3 => 800, 4 => 7800, 5 => 8873100]);
         break;
         case 6 :
-            define('WINNING_NUMBERS', [19,23,29,33,36,40]);
-            define('BONUS_NUMBER', 27);
+            define('WINNING_NUMBERS', [5,16,17,28,36,40]);
+            define('BONUS_NUMBER', 14);
 
             define('TICKET_PRICE', 200);
             define('MIN', 1);
             define('MAX', 43);
-            define('MIN_TOTAL', 167);
-            define('MAX_TOTAL', 184);
+            define('MIN_TOTAL', 131);
+            define('MAX_TOTAL', 148);
             define('TOP_NUMBER', explode(',', '2,24,6,42,21,43,38,19,32,26,10,37,27,15,5')); // lotto 6
-            define('PRIZE_POOL', [0 => 9101900, 3 => 1000, 4 => 5800, 5 => 280000, 6 => 300100700]);
+            define('PRIZE_POOL', [0 => 9101900, 3 => 1000, 4 => 6500, 5 => 305500, 6 => 300100700]);
         break;
         case 7 :
-            define('WINNING_NUMBERS', [4,9,10,23,28,30,34]);
-            define('BONUS_NUMBERS', 18);
+            define('WINNING_NUMBERS', [3,10,12,18,19,24,32]);
+            define('BONUS_NUMBER', 4);
 
             define('TICKET_PRICE', 300);
             define('MIN', 1);
             define('MAX', 37);
-            define('MIN_TOTAL', 127);
-            define('MAX_TOTAL', 140);
+            define('MIN_TOTAL', 113);
+            define('MAX_TOTAL', 126);
             define('TOP_NUMBER', explode(',', '15,13,9,30,4,32,34,26,17,35,36,29,31,11,21')); // lotto 7
-            define('PRIZE_POOL', [0 => 4787500, 3 => 1000, 4 => 1400, 5 => 8900, 6 => 727400, 7 => 748847700]);
+            define('PRIZE_POOL', [0 => 12275400, 3 => 1000, 4 => 1300, 5 => 6900, 6 => 727400, 7 => 1200000000]);
         break;
     }
 
@@ -55,23 +57,13 @@
     echo 'Ticket Price : '.number_format(COMBINATIONS*TICKET_PRICE).'円<br/>';
     echo 'Total Price : '.number_format($total_price).'円';
 
-    function generate() {  
+    function generate() {
         global $generated_combos, $current_combo, $x, $hits, $total_price;
     
         $max_digits = MAX_DIGITS;
         $current_combo = array();
 
         $hits = 0;
-        $is_top = (mt_rand(1, 100) <= 70) ? 0 : 1;
-        if($is_top) {
-            // get from top numbers
-            $rand = rand(1, 3);
-
-            $max_digits = $max_digits - $rand;
-            for($num = 1; $num <= $rand; $num++) {
-                $current_combo[] = addHits(topRand());
-            }
-        }
 
         // generate 6digits
         for($num = 1; $num <= $max_digits; $num++) {
@@ -98,9 +90,12 @@
                     } else {
                         $total_price += PRIZE_POOL[$hits];
                     }
-                    echo $total.'【'.$str_combo.'】（'.$hits.' hits'.$bonus.'）<br />';
+
+                  // echo $x.'.【'.$str_combo.'】 ('. $total.')（'.$hits.' hits'.$bonus.'）<br />';
                 }
-    
+                echo $x.'.【'.$str_combo.'】 ('. $total.')（'.$hits.' hits'.$bonus.'）<br />';
+                
+                
                 $generated_combos[] = $str_combo;
                 $x++;
             }
@@ -121,27 +116,27 @@
         return $num;
     }
 
-    function topRand() {
-        global $current_combo;
-
-        $num = TOP_NUMBER[rand(0, (count(TOP_NUMBER) - 1) )];
-
-        if(in_array($num, $current_combo)) {
-            return topRand();
-        }
-
-        return $num;
-    }
-
     function random() {
         global $current_combo;
 
-        $num = rand(MIN, MAX);
+        $oddCount = count(array_filter($current_combo, function($num) {
+            return $num % 2 !== 0;
+        }));
+
+        if($oddCount < ODD_NUM) {
+            do {
+                $num = rand(MIN, MAX);
+            } while ($num % 2 === 0);
+        } else {
+            do {
+                $num = rand(MIN, MAX);
+            } while ($num % 2 !== 0);
+        }
+
         if(in_array($num, $current_combo)) {
             return random();
         }
 
         return $num;
     }
-
 ?>
